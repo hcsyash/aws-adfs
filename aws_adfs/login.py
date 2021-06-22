@@ -230,6 +230,8 @@ def login(
         _print_environment_variables(aws_session_token,config)
     else:
         _store(config, aws_session_token)
+        config.profile = 'default'
+        _store(config, aws_session_token)
         # _emit_summary(config, aws_session_duration)
 
 
