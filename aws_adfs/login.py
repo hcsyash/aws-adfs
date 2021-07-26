@@ -147,7 +147,8 @@ def login(
 
     _verification_checks(config)
     hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
+    print(hostname)
+    local_ip = socket.gethostbyname('HIBACL131230')
     click.echo('Trying re-authenticating using an existing ADFS session at IP {} and Host {}'.format(local_ip, hostname))
     # Try re-authenticating using an existing ADFS session
     principal_roles, assertion, aws_session_duration = authenticator.authenticate(config, assertfile=assertfile)
