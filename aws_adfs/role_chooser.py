@@ -7,10 +7,11 @@ import click
 def choose_role_to_assume(config, principal_roles):
     chosen_principal_arn = None
     chosen_role_arn = None
+    custom_profile = None
 
     principal_roles_emptied = not bool(principal_roles)
     if principal_roles_emptied:
-        return chosen_principal_arn, chosen_role_arn
+        return chosen_principal_arn, chosen_role_arn, custom_profile
 
     role_collection = []
     principal_roles = collections.OrderedDict(sorted(principal_roles.items(), key=lambda t: t[0]))
@@ -31,6 +32,7 @@ def choose_role_to_assume(config, principal_roles):
     #     chosen_role_arn = chosen_principal_role[0][1]
     #     return chosen_principal_arn, chosen_role_arn
 
+    custom_profile = 'default'
     if len(role_collection) == 1:
         logging.debug(u'There is only one role to choose')
         chosen_principal_arn = role_collection[0][0]
