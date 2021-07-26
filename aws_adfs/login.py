@@ -162,21 +162,20 @@ def login(
         elif authfile:
             config.adfs_user, password = _file_user_credentials(config.profile, authfile)
 
-        config.adfs_user = click.prompt(text='Username', type=str, default=config.adfs_user)
         if not config.adfs_user:
             try: 
                 hostname = socket.gethostname()
                 print(hostname)
                 local_ip = socket.gethostbyname(hostname)
                 if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
-                    print('Extranet')
+                    print('Intranet')
                     config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
                 else:
-                    print('Intranet')
+                    print('Extranet')
                     config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
             except:
                 print('Cannot retrieve the IP Address')
-                config.adfs_user = click.prompt(text='Usercode', type=str, default=config.adfs_user)
+                config.adfs_user = click.prompt(text='Username', type=str, default=config.adfs_user)
         #if not config.adfs_user:
         #    if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
         #        print('Extranet')
