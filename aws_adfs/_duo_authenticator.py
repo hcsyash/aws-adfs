@@ -24,10 +24,10 @@ except ImportError:
     import Queue as queue
 
 from . import roles_assertion_extractor
-
+#'HCS/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/60.0'
 _headers = {
     'Accept-Language': 'en',
-    'User-Agent': 'HCS/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/60.0',
+    'User-Agent': 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'Accept': 'text/plain, */*; q=0.01',
 }
@@ -444,10 +444,10 @@ def _initiate_authentication(duo_host, duo_request_signature, roles_page_url, se
     prompt_for_url = 'https://{}/frame/web/v1/auth'.format(duo_host)
     response = session.post(
         prompt_for_url,
-        verify=ssl_verification_enabled,
+        verify=ssl_verification_enabled,#"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
         headers={
             'Host': duo_host,
-            'User-Agent': 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',#"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
+            'User-Agent': 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
             'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             'Accept-Language': "en-US,en;q=0.5",
             'Accept-Encoding': "gzip, deflate, br",
