@@ -169,10 +169,11 @@ def login(
                 local_ip = socket.gethostbyname(hostname)
                 if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
                     print('Intranet')
-                    config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
+                    config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
+                    config.adfs_user = config.adfs_user + '@AD.HARMAN.COM' #Todo
                 else:
                     print('Extranet')
-                    config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
+                    config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
             except:
                 print('Cannot retrieve the IP Address')
                 config.adfs_user = click.prompt(text='Username', type=str, default=config.adfs_user)
