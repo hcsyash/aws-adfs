@@ -5,10 +5,10 @@ import sys
 
 import click
 
-from . import list_profiles
-from . import login
-from . import reset
-from . import _version
+from aws_adfs import list_profiles
+from aws_adfs import login
+from aws_adfs import reset
+from aws_adfs import _version
 
 
 def _print_version(ctx, param, value):

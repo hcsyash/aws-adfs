@@ -30,7 +30,7 @@ def choose_role_to_assume(config, principal_roles):
     #                   .format(chosen_principal_role))
     #     chosen_principal_arn = chosen_principal_role[0][0]
     #     chosen_role_arn = chosen_principal_role[0][1]
-    #     return chosen_principal_arn, chosen_role_arn
+    #     return chosen_principal_arn, chosen_role_arn, 'default'
 
     custom_profile = 'default'
     if len(role_collection) == 1:
@@ -45,15 +45,13 @@ def choose_role_to_assume(config, principal_roles):
             roles = principal_roles[account_name]
             for role_arn in roles.keys():
                 role_entry = roles[role_arn]
-                click.echo('  [{}] : {} / {} '.format(i, account_name, role_entry['name']))
+                click.echo(' [{}] : {} / {} '.format(i, account_name, role_entry['name']))
                 i += 1
 
         selected_index = click.prompt(text='Selection', type=click.IntRange(0, len(role_collection)))
 
         chosen_principal_arn = role_collection[selected_index][0]
         chosen_role_arn = role_collection[selected_index][1]
-
-        custom_profile = 'default'
         if(role_arn is not None):
             for key, value in principal_roles.items():
                 for accountKey in value.keys():
@@ -61,5 +59,5 @@ def choose_role_to_assume(config, principal_roles):
                         custom_profile = key
                         custom_profile = custom_profile + "-" + chosen_role_arn.split("/")[1]
                         break
-    click.echo(' Profile {} '.format(custom_profile))
+    click.echo(' custom_profile {} '.format(custom_profile))
     return chosen_principal_arn, chosen_role_arn, custom_profile

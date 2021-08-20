@@ -18,6 +18,8 @@ def authenticate(config, username=None, password=None, assertfile=None):
         ssl_verification_enabled=config.ssl_verification,
         adfs_ca_bundle=config.adfs_ca_bundle,
         provider_id=config.provider_id,
+        extranet_ip=config.extranet_ip,
+        company_domain=config.company_domain,
         username=username,
         password=password,
         sspi=config.sspi,
@@ -48,7 +50,7 @@ def authenticate(config, username=None, password=None, assertfile=None):
                 response.headers,
                 response.text
             ))
-            logging.error(u'Cannot extract saml assertion')
+            print(u'Cannot extract saml assertion from previous Session, hence, Re-authentication needed')
         else:
             aggregated_principal_roles = _aggregate_roles_by_account_alias(session,
                                                                            config,

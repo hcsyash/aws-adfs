@@ -24,7 +24,7 @@ except ImportError:
     import Queue as queue
 
 from . import roles_assertion_extractor
-#'HCS/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/60.0'
+
 _headers = {
     'Accept-Language': 'en',
     'User-Agent': 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
@@ -444,10 +444,10 @@ def _initiate_authentication(duo_host, duo_request_signature, roles_page_url, se
     prompt_for_url = 'https://{}/frame/web/v1/auth'.format(duo_host)
     response = session.post(
         prompt_for_url,
-        verify=ssl_verification_enabled,#"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
+        verify=ssl_verification_enabled,
         headers={
-            'Host': duo_host,
-            'User-Agent': 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
+            'Host': duo_host, #Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36  #Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+            'User-Agent': "HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko",
             'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             'Accept-Language': "en-US,en;q=0.5",
             'Accept-Encoding': "gzip, deflate, br",
@@ -470,7 +470,7 @@ def _initiate_authentication(duo_host, duo_request_signature, roles_page_url, se
             'color_depth': '24',
         }
     )
-    logging.debug(u'''Request:
+    logging.info(u'''Request:
         * url: {}
         * headers: {}
     Response:
@@ -550,7 +550,7 @@ def _begin_authentication_transaction(duo_host, sid, preferred_factor, preferred
                 'out_of_date': ''
             }
         )
-    logging.debug(u'''Request:
+    logging.info(u'''Request:
         * url: {}
         * headers: {}
     Response:
@@ -589,7 +589,7 @@ def _submit_u2f_response(duo_host, sid, u2f_response, session, ssl_verification_
             'response_data': json.dumps(u2f_response),
         }
     )
-    logging.debug(u'''Request:
+    logging.info(u'''Request:
         * url: {}
         * headers: {}
     Response:

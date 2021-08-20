@@ -10,12 +10,10 @@ import logging
 from platform import system
 import sys
 import json
-from . import authenticator
-from . import prepare
-from . import role_chooser
-import re
+from aws_adfs import authenticator
+from aws_adfs import prepare
+from aws_adfs import role_chooser
 import socket
-
 
 @click.command()
 @click.option(
@@ -29,6 +27,14 @@ import socket
     '--region',
     help='The default AWS region that this script will connect\n'
          'to for all API calls',
+)
+@click.option(
+    '--extranet_ip',
+    help='For Accessing Tool from Intranet',
+)
+@click.option(
+    '--company_domain',
+    help='For Accessing Tool from Intranet',
 )
 @click.option(
     '--ssl-verification/--no-ssl-verification',
@@ -127,6 +133,8 @@ def login(
         assertfile,
         sspi,
         u2f_trigger_default,
+        extranet_ip,
+        company_domain,
 ):
     """
     Authenticates an user with active directory credentials
@@ -143,14 +151,18 @@ def login(
         session_duration,
         sspi,
         u2f_trigger_default,
+        extranet_ip,
+        company_domain,
     )
 
     _verification_checks(config)
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
 
-    #click.echo('Trying re-authenticating using an existing ADFS session at IP {} and Host {}'.format(local_ip, hostname))
     # Try re-authenticating using an existing ADFS session
+    # click.echo('Trying re-authenticating using an existing ADFS session at IP {} and Host {}'.format(local_ip, hostname ))
     principal_roles, assertion, aws_session_duration = authenticator.authenticate(config, assertfile=assertfile)
-    click.echo('Trying re-authenticating using an existing ADFS session')
+
     # If we fail to get an assertion, prompt for credentials and try again
     if assertion is None:
         password = None
@@ -162,28 +174,23 @@ def login(
         elif authfile:
             config.adfs_user, password = _file_user_credentials(config.profile, authfile)
 
+        #Private networks can use IPv4 addresses anywhere in the following ranges:
+        # a) 192.168.0.0 - 192.168.255.255 (65,536 IP addresses)
+        # b) 172.16.0.0 -172.31.255.255 (1,048,576 IP addresses)
+        # c) 10.0.0.0 - 10.255.255.255 (16,777,216 IP addresses)
         if not config.adfs_user:
-            try: 
-                hostname = socket.gethostname()
-                print(hostname)
-                local_ip = socket.gethostbyname(hostname)
-                if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
-                    print('Intranet')
-                    config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
-                    config.adfs_user = config.adfs_user + '@AD.HARMAN.COM' #Todo
-                else:
-                    print('Extranet')
-                    config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
-            except:
-                print('Cannot retrieve the IP Address')
-                config.adfs_user = click.prompt(text='Username', type=str, default=config.adfs_user)
-        #if not config.adfs_user:
-        #    if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
-        #        print('Extranet')
-        #        config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
-        #    else:
-        #        print('Intranet')
-        #        config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
+            #if re.match(r"(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)", local_ip):
+            ip = [int(numeric_string) for numeric_string in local_ip.split(".")]
+            if (((ip[0]) == 10) | (((ip[0]) == 172) & (ip[1]) >= 16 & (ip[1]) <= 31) | (((ip[0]) == 192) & ((ip[1]) == 168))):
+                print('Intranet')
+                config.adfs_user = click.prompt(text='HarmanId', type=str, default=config.adfs_user)
+                config.adfs_user = config.adfs_user + '@AD.HARMAN.COM'
+
+            else:
+                print('Extranet')
+                config.adfs_user = click.prompt(text='HarmanEmail', type=str, default=config.adfs_user)
+
+            #print(config.adfs_user)
 
         if not password:
             password = click.prompt('Password', type=str, hide_input=True)
@@ -197,7 +204,7 @@ def login(
         config.role_arn = role_arn
     principal_arn, config.role_arn, custom_profile = role_chooser.choose_role_to_assume(config, principal_roles)
     if principal_arn is None or config.role_arn is None:
-        click.echo('This account does not have access to any roles', err=True)
+        click.echo(' Wrong Credentials or This account does not have access to any roles', err=True)
         exit(-1)
 
     # Use the assertion to get an AWS STS token using Assume Role with SAML
@@ -253,9 +260,9 @@ def login(
         _print_environment_variables(aws_session_token,config)
     else:
         _store(config, aws_session_token)
-        config.profile = 'default'
+        config.profile = "default"
         _store(config, aws_session_token)
-        # _emit_summary(config, aws_session_duration)
+    # _emit_summary(config, aws_session_duration)
 
 
 def _emit_json(aws_session_token):

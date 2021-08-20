@@ -24,7 +24,7 @@ def account_aliases(session, username, password, auth_method, saml_response, con
         }
     )
 
-    logging.debug(u'''Request:
+    logging.info(u'''Request:
         * url: {}
         * headers: {}
     Response:

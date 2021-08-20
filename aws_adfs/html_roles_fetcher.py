@@ -2,6 +2,7 @@ import logging
 import os
 from platform import system
 import requests
+import socket
 
 try:
     import cookielib
@@ -25,12 +26,39 @@ except ImportError:
 # The initial URL that starts the authentication process.
 _IDP_ENTRY_URL = 'https://{}/adfs/ls/IdpInitiatedSignOn.aspx?loginToRp={}'
 
+def is_ipv4(s):
+    # Feel free to improve this: https://stackoverflow.com/questions/11827961/checking-for-ip-addresses
+    return ':' not in s
+
+dns_cache = {}
+
+def add_custom_dns(domain, port, ip):
+    key = (domain, port)
+    # Strange parameters explained at:
+    # https://docs.python.org/2/library/socket.html#socket.getaddrinfo
+    # Values were taken from the output of `socket.getaddrinfo(...)`
+    if is_ipv4(ip):
+        value = (socket.AddressFamily.AF_INET, 0, 0, '', (ip, port))
+    else: # ipv6
+        value = (socket.AddressFamily.AF_INET6, 0, 0, '', (ip, port, 0, 0))
+    dns_cache[key] = [value]
+
+prv_getaddrinfo = socket.getaddrinfo
+def new_getaddrinfo(*args):
+    # Uncomment to see what calls to `getaddrinfo` look like.
+    #print(args)
+    try:
+        return dns_cache[args[:2]] # hostname and port
+    except KeyError:
+        return prv_getaddrinfo(*args)
 
 def fetch_html_encoded_roles(
         adfs_host,
         adfs_cookie_location,
         ssl_verification_enabled,
         provider_id,
+        extranet_ip,
+        company_domain,
         adfs_ca_bundle=None,
         username=None,
         password=None,
@@ -43,9 +71,13 @@ def fetch_html_encoded_roles(
     # so that it servers up a redirect to the IWA page.
     if sspi:
         _headers['User-Agent'] = 'HCS/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
+                                 #'Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/60.0'
 
-    # Initiate session handler
+    _headers['Host'] = adfs_host
     session = requests.Session()
+    # Redirect example.com to the IP of test.domain.com (completely unrelated).
+    add_custom_dns(adfs_host, 443, extranet_ip)
+    socket.getaddrinfo = new_getaddrinfo
 
     # LWPCookieJar has an issue on Windows when cookies have an 'expires' date too far in the future and they are converted from timestamp to datetime.
     # MozillaCookieJar works because it does not convert the timestamps.
@@ -71,7 +103,8 @@ def fetch_html_encoded_roles(
                 username, domain = username.split('@', 1)
             elif '\\' in username: # Down-level logon name format
                 domain, username = username.split('\\', 1)
-
+            else:
+                domain=company_domain
         if system() == 'Windows':
             auth = _auth_provider(username, password, domain)
         elif username and domain:
@@ -81,12 +114,14 @@ def fetch_html_encoded_roles(
         data = None
     else:
         auth = None
+        if username:
+            if '@' not in username: # User principal name (UPN) format
+                username = username + '@' + company_domain
         data={
             'UserName': username,
             'Password': password,
             'AuthMethod': 'FormsAuthentication'
         }
-
     if adfs_ca_bundle:
         ssl_verification = adfs_ca_bundle
     else:
@@ -94,6 +129,7 @@ def fetch_html_encoded_roles(
 
     # Opens the initial AD FS URL and follows all of the HTTP302 redirects
     authentication_url = _IDP_ENTRY_URL.format(adfs_host, provider_id)
+    # print('Authtication URL {} , headers {}, ip {}'.format(authentication_url, _headers.items(), extranet_ip))
     response = session.post(
         authentication_url,
         verify=ssl_verification,
