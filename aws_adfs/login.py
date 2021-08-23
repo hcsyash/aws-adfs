@@ -157,7 +157,10 @@ def login(
 
     _verification_checks(config)
     hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
+    try:
+     local_ip = socket.gethostbyname(hostname)
+    except:
+     local_ip = '127.0.0.1'
 
     # Try re-authenticating using an existing ADFS session
     # click.echo('Trying re-authenticating using an existing ADFS session at IP {} and Host {}'.format(local_ip, hostname ))
