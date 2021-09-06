@@ -19,7 +19,7 @@ def get_prepared_config(
         session_duration,
         sspi,
         u2f_trigger_default,
-        extranet_ip,
+        #extranet_ip,
         company_domain,
 ):
     """
@@ -56,7 +56,7 @@ def get_prepared_config(
     adfs_config.ssl_verification = default_if_none(ssl_verification, adfs_config.ssl_verification)
     adfs_config.adfs_ca_bundle = default_if_none(adfs_ca_bundle, adfs_config.adfs_ca_bundle)
     adfs_config.region = default_if_none(region, adfs_config.region)
-    adfs_config.extranet_ip = default_if_none(extranet_ip, adfs_config.extranet_ip)
+    #adfs_config.extranet_ip = default_if_none(extranet_ip, adfs_config.extranet_ip)
     adfs_config.company_domain = default_if_none(company_domain, adfs_config.company_domain)
     adfs_config.adfs_host = default_if_none(adfs_host, adfs_config.adfs_host)
     adfs_config.output_format = default_if_none(output_format, adfs_config.output_format)
@@ -127,7 +127,7 @@ def create_adfs_default_config(profile):
     # Whether to also trigger the default authentication method when U2F is available
     config.u2f_trigger_default = True
 
-    config.extranet_ip = None
+    #config.extranet_ip = None
 
     config.company_domain = None
 

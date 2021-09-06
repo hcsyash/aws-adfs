@@ -28,10 +28,10 @@ import socket
     help='The default AWS region that this script will connect\n'
          'to for all API calls',
 )
-@click.option(
-    '--extranet_ip',
-    help='For Accessing Tool from Intranet',
-)
+# @click.option(
+#     '--extranet_ip',
+#     help='For Accessing Tool from Intranet',
+# )
 @click.option(
     '--company_domain',
     help='For Accessing Tool from Intranet',
@@ -133,7 +133,7 @@ def login(
         assertfile,
         sspi,
         u2f_trigger_default,
-        extranet_ip,
+        #extranet_ip,
         company_domain,
 ):
     """
@@ -151,16 +151,16 @@ def login(
         session_duration,
         sspi,
         u2f_trigger_default,
-        extranet_ip,
+        #extranet_ip,
         company_domain,
     )
 
     _verification_checks(config)
     hostname = socket.gethostname()
     try:
-     local_ip = socket.gethostbyname(hostname)
+        local_ip = socket.gethostbyname(hostname)
     except:
-     local_ip = '127.0.0.1'
+        local_ip = '127.0.0.1'
 
     # Try re-authenticating using an existing ADFS session
     # click.echo('Trying re-authenticating using an existing ADFS session at IP {} and Host {}'.format(local_ip, hostname ))

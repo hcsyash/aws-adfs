@@ -18,7 +18,7 @@ def authenticate(config, username=None, password=None, assertfile=None):
         ssl_verification_enabled=config.ssl_verification,
         adfs_ca_bundle=config.adfs_ca_bundle,
         provider_id=config.provider_id,
-        extranet_ip=config.extranet_ip,
+        #extranet_ip=config.extranet_ip,
         company_domain=config.company_domain,
         username=username,
         password=password,

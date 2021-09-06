@@ -57,7 +57,7 @@ def fetch_html_encoded_roles(
         adfs_cookie_location,
         ssl_verification_enabled,
         provider_id,
-        extranet_ip,
+        #extranet_ip,
         company_domain,
         adfs_ca_bundle=None,
         username=None,
@@ -76,8 +76,8 @@ def fetch_html_encoded_roles(
     _headers['Host'] = adfs_host
     session = requests.Session()
     # Redirect example.com to the IP of test.domain.com (completely unrelated).
-    add_custom_dns(adfs_host, 443, extranet_ip)
-    socket.getaddrinfo = new_getaddrinfo
+    #add_custom_dns(adfs_host, 443, extranet_ip)
+    #socket.getaddrinfo = new_getaddrinfo
 
     # LWPCookieJar has an issue on Windows when cookies have an 'expires' date too far in the future and they are converted from timestamp to datetime.
     # MozillaCookieJar works because it does not convert the timestamps.

@@ -13,7 +13,7 @@ SET AWS_REGION=%awsRegion%
 SET DOMAIN=%company_domain%
 SET EXTRANET_IP=%extranet_ip%
 IF "%DEBUG_FLAG%"=="-D" ( 
-aws-adfs --verbose login --adfs-host %ADFS_SERVER% --region %AWS_REGION% --company_domain %DOMAIN% --extranet_ip %EXTRANET_IP% --no-sspi
+aws-adfs --verbose login --adfs-host %ADFS_SERVER% --region %AWS_REGION% --company_domain %DOMAIN% --no-sspi
 ) ELSE (
-aws-adfs login --adfs-host %ADFS_SERVER% --region %AWS_REGION% --company_domain %DOMAIN% --extranet_ip %EXTRANET_IP% --no-sspi
+aws-adfs login --adfs-host %ADFS_SERVER% --region %AWS_REGION% --company_domain %DOMAIN% --no-sspi
 )
